@@ -1,25 +1,6 @@
-Must have
-
-RPI 4
-Camera
-Mediapipe
-Scikit learn
-Opencv
-Google assistant sdk
-
-Should have
-
-Display
-Mic
-Speaker
-Enclosure
-
-Could have
-
-Open other apps
-Play music
-
-
-Will not have
-
-Connection to real world appliances
+mediapipe == 0.8.4
+opencv-python == 4.6.0.66
+tensorflow == 2.9.0
+scikit-learn == 1.0.2
+matplotlib == 3.5.1
+protobuf<3.20,>=3.9.2
