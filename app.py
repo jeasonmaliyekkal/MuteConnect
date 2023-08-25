@@ -11,7 +11,6 @@ import datetime
 import pandas as pd
 
 from model import KeyPointClassifier
-from utils import CvFpsCalc
 
 from utils.maps import get_taxi_charge
 from utils.weather import get_weather
@@ -20,12 +19,14 @@ from utils.youtube import play_youtube_video_in_brave
 from utils.time import say_current_time
 from utils.mouse import map_hand_to_mouse, click
 from utils.landmarks import calc_landmark_list, pre_process_landmark, draw_landmarks, draw_info_text
+from utils.fps_counter import FPSCounter
 
 from config import GOOGLE_MAPS_API_KEY, WEATHER_API_KEY
 
 # Main function for running the program
 def main():
     cap = cv.VideoCapture(0)
+    fps_counter = FPSCounter()
     cap.set(cv.CAP_PROP_FRAME_WIDTH, 960)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 540)
 
@@ -41,20 +42,17 @@ def main():
     keypoint_classifier = KeyPointClassifier()
 
     # Load the labels for the classifiers
-    with open('model/keypoint_classifier/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
+    with open('model/classifier/label.csv', encoding='utf-8-sig') as f:
         keypoint_classifier_labels = [row[0] for row in csv.reader(f)]
-
-    # Set up some other necessary variables
-    cvFpsCalc = CvFpsCalc(buffer_len=10)
     
     # To prevent instantaneous trigger of gestures
     prev_gestures = [None] * 50
     current_gesture_count = 0
 
+    fps_counter.start()
+
     # Main loop for capturing and processing video frames
     while True:
-        # Get the current FPS
-        fps = cvFpsCalc.get()
 
         # Handle any key presses
         key = cv.waitKey(10)
@@ -121,18 +119,20 @@ def main():
                     click()
                 debug_image = draw_info_text(
                     debug_image,
-                    fps,
+                    fps_counter.get_fps(),
                     handedness,
                     keypoint_classifier_labels[hand_sign_id],
                 )
                 draw_landmarks(debug_image,hand_landmarks)
+        fps_counter.update()       
 
         # Show image
-        cv.putText(debug_image, "FPS:" + str(fps), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 1, cv.LINE_AA)
+        cv.putText(debug_image, "FPS:" + str(fps_counter.get_fps()), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 1, cv.LINE_AA)
         cv.imshow('Hand Gesture Recognition', debug_image)
 
     cap.release()
     cv.destroyAllWindows()
+    fps_counter.stop()
 
 def greet_user():
     text_to_speak = (

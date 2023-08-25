@@ -19,16 +19,16 @@ hands = mp_hands.Hands(
 
 def logging_csv(number, landmark_list):
     # log key point
-    csv_path = 'model/keypoint_classifier/keypoint.csv'
+    csv_path = 'model/classifier/data.csv'
     with open(csv_path, 'a', newline="") as f:
         writer = csv.writer(f)
         writer.writerow([number, *landmark_list])
     return
 
 number_of_classes = 10
-dataset_size = 250
+dataset_size = 1000
 
-for j in range(number_of_classes):
+for j in range(5,number_of_classes):
 
     print('Collecting data for class {}'.format(j))
 
